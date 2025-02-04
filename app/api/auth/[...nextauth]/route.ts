@@ -22,11 +22,22 @@ const handler = NextAuth({
     },
     async session({ session, token }) {
       session.user = {
-        id: token.id as string,
-        username: token.username as string,
-        role: token.role as "ADMIN" | "MODERATOR" | "TECHNICIAN",
+        id: token.id,
+        username: token.username,
+        role: token.role,
       };
       return session;
+    },
+  },
+  cookies: {
+    sessionToken: {
+      name: `__Secure-next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+      },
     },
   },
   providers: [
