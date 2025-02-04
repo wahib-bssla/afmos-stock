@@ -1,4 +1,4 @@
-import { signIn } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
@@ -6,6 +6,13 @@ const LoginForm = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
+
+  useEffect(() => {
+    if (session) {
+      console.log("Session updated:", session);
+      router.push("/");
+    }
+  }, [session, router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,7 +35,7 @@ const LoginForm = () => {
       setIsLoading(false);
     } else if (result?.url) {
       // Immediately redirect the user
-      router.push(result.url);
+      window.location.href = result.url;
     }
   };
 
