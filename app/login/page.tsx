@@ -26,6 +26,7 @@ const LoginForm = () => {
         redirect: false,
         username,
         password,
+        callbackUrl: "/",
       });
 
       if (response?.error) {
