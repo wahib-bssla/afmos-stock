@@ -28,20 +28,16 @@ const LoginForm = () => {
         password,
         callbackUrl: "/",
       });
-
-      if (response?.error) {
-        throw new Error("Nom d&apos;utilisateur ou mot de passe incorrect.");
-      }
-
-      router.refresh();
-      router.push('/');
-    } catch (_) {
-      setError('Une erreur inattendue est survenue.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+      
+      if (result?.error) {
+            setErrorMessage(result.error);
+            setIsLoading(false);
+          } else if (result?.url) {
+            // Redirect the user
+            window.location.href = result.url;
+          }
+        };
+    
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-6 sm:px-8 lg:px-10">
       <div className="max-w-md w-full space-y-6 bg-white p-10 rounded-xl shadow-xl">
