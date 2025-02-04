@@ -3,16 +3,18 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 
 const LoginForm = () => {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
 
-  useEffect(() => {
-    if (session) {
-      console.log("Session updated:", session);
-      router.push("/");
-    }
-  }, [session, router]);
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+useEffect(() => {
+  if (status === "authenticated") {
+    console.log("Session Updated:", session);
+    router.push("/");
+  }
+}, [status, session, router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
