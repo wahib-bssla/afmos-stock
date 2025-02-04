@@ -1,67 +1,48 @@
-'use client';
-import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import { FormEvent, useState } from 'react';
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/router";
+import { useState } from "react";
 
 const LoginForm = () => {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setError(null);
-    
-    try {
-      const formData = new FormData(e.currentTarget);
-      const username = formData.get('username')?.toString().trim();
-      const password = formData.get('password')?.toString().trim();
+    setErrorMessage(null);
 
-      if (!username || !password) {
-        throw new Error('Veuillez remplir tous les champs.');
-      }
+    const username = e.target.username.value;
+    const password = e.target.password.value;
 
-      const response = await signIn('credentials', {
-        redirect: false,
-        username,
-        password,
-        callbackUrl: "/",
-      });
-      
-      if (result?.error) {
-            setErrorMessage(result.error);
-            setIsLoading(false);
-          } else if (result?.url) {
-            // Redirect the user
-            window.location.href = result.url;
-          }
-        };
-    
+    // Attempt to sign in without automatically redirecting
+    const result = await signIn("credentials", {
+      redirect: false,
+      username,
+      password,
+      callbackUrl: "/", // this will be used by NextAuth internally
+    });
+
+    if (result?.error) {
+      setErrorMessage(result.error);
+      setIsLoading(false);
+    } else if (result?.url) {
+      // Immediately redirect the user
+      router.push(result.url);
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-6 sm:px-8 lg:px-10">
-      <div className="max-w-md w-full space-y-6 bg-white p-10 rounded-xl shadow-xl">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">
-            Connexion à votre compte
-          </h2>
-        </div>
-        {error && (
-          <div
-            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
-            role="alert"
-          >
-            <span>{error}</span>
-          </div>
-        )}
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="max-w-md w-full space-y-8">
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+          <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label
                 htmlFor="username"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Nom d&apos;utilisateur
+                Nom d'utilisateur
               </label>
               <input
                 id="username"
@@ -91,6 +72,10 @@ const LoginForm = () => {
               />
             </div>
           </div>
+
+          {errorMessage && (
+            <p className="text-red-500 text-sm">{errorMessage}</p>
+          )}
 
           <button
             type="submit"
